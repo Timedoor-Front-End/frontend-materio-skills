@@ -1,0 +1,11 @@
+{
+  "name": "timedoor-frontend",
+  "owner": { "name": "Timedoor Front-End" },
+  "plugins": [
+    {
+      "name": "tmdr-materio",
+      "source": "./",
+      "description": "Generate Materio Vuetify pages (and the Laravel backend behind them) following Timedoor frontend standards."
+    }
+  ]
+}

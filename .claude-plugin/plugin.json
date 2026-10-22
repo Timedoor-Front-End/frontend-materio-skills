@@ -1,0 +1,6 @@
+{
+  "name": "tmdr-materio",
+  "description": "Generate Materio Vuetify pages (and the Laravel backend behind them) following Timedoor frontend standards.",
+  "author": { "name": "Timedoor Front-End" },
+  "repository": "https://github.com/Timedoor-Front-End/frontend-materio-skills"
+}
