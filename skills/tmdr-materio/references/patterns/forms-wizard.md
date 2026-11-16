@@ -14,6 +14,8 @@ in `components/pages/<route>/` used by both `create.vue` and `[id]/edit.vue` —
 ```vue
 <!-- components/pages/admin/events/EventForm.vue (body) -->
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
+
 interface Props { id?: number, title: string, subtitle?: string, initial?: Partial<EventInput> }
 const props = defineProps<Props>()
 const router = useRouter()
@@ -37,6 +39,7 @@ const onSubmit = async () => {
     const res = props.id
       ? await $api<{ data: { id: number } }>(`/admin/events/${props.id}`, { method: 'PUT', body: form.value })
       : await $api<{ data: { id: number } }>('/admin/events', { method: 'POST', body: form.value })
+    toast.success('Event saved.')
     router.push(`/admin/events/${res.data.id}`) // Nuxt: await navigateTo(...)
   }
   catch (e) {
@@ -53,8 +56,13 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <!-- PageHeader with Cancel + <VBtn type="submit" form="event-form" :loading="isSubmitting"> — see page-header.md -->
-  <VAlert v-if="formError" type="error" variant="tonal" class="mb-4">{{ formError }}</VAlert>
+  <!-- PageHeader with Cancel + <VBtn type="submit" form="event-form" :loading="isSubmitting" :disabled="isSubmitting"> — see page-header.md -->
+  <VAlert v-if="formError" color="error" variant="tonal" closable class="mb-4" @click:close="formError = ''">
+    <div class="d-flex align-center gap-x-2">
+      <VIcon icon="ri-error-warning-line" size="20" />
+      <span>{{ formError }}</span>
+    </div>
+  </VAlert>
   <VCard> <!-- no title: the PageHeader names the page -->
     <VCardText>
       <VForm id="event-form" ref="refForm" @submit.prevent="onSubmit">
@@ -137,7 +145,7 @@ const next = async () => {
         <div class="d-flex justify-space-between mt-6">
           <VBtn color="secondary" variant="outlined" :disabled="currentStep === 0" @click="currentStep--">Previous</VBtn>
           <VBtn v-if="currentStep < steps.length - 1" @click="next">Next</VBtn>
-          <VBtn v-else :loading="isSubmitting" @click="submit">Submit</VBtn>
+          <VBtn v-else :loading="isSubmitting" :disabled="isSubmitting" @click="submit">Submit</VBtn>
         </div>
       </VCardText>
     </VCard>

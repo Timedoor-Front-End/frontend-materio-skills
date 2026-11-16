@@ -49,14 +49,17 @@ Unused demo components are not in the kit: `AppPricing`, `AppSearchHeader`, and 
 |---|---|
 | Vue / Laravel: `vite.config.ts` (project root) | `Components({ dirs: ['<src>/@core/components', '<src>/components/global'] })` — `components/pages/` is not in `dirs` |
 | Nuxt: `nuxt.config.ts` (project root) | `components` option registers `~/components/global` (and `@core/components`) with `pathPrefix: false`, so names stay bare. Page-specific components are still imported explicitly, for consistency with the other variants. |
+| Nuxt: `nuxt.config.ts` `css` / Vue, Laravel: `main.ts` import | `vue3-toastify/dist/index.css` — styles for `toast()` |
 | `plugins/vuetify/defaults.ts` | `VForm: { validateOn: 'blur lazy' }` — validation on blur and submit, never on first render |
 | the project's main `styles.scss` (Laravel: `resources/styles/`, Vue/Nuxt: under `<src>/assets/styles/`) | `.bg-info-block` (tinted read-only block, table-header tone) and `.v-card .v-card-subtitle` at 13px |
 
 ## npm dependencies
 
-`cleave-zen` (NumberField) and `@vuepic/vue-datepicker` **v14** (DateTimeField —
+`cleave-zen` (NumberField), `@vuepic/vue-datepicker` **v14** (DateTimeField —
 the component uses v14's `dp-input` slot, `formats.input`, `timeConfig`,
-`actionRow`; another major version needs the component adapted first).
+`actionRow`; another major version needs the component adapted first) and
+`vue3-toastify` (every notification — SKILL.md "Notifications"; `toast()` works
+without a plugin, only the CSS must be loaded).
 
 ## Conventions the kit assumes
 
@@ -86,11 +89,11 @@ checked separately and don't block: `checklist.md` → "Project setup".
 ## Check before generating (SKILL.md Step 0 — once per session)
 
 Look for the six component files, the two composable/util files, the
-auto-import config, the `VForm` default, the style utility and both npm
-packages. If anything is missing, **stop and tell the developer which pieces
-are missing** — the project was probably created from stock Materio or an
+auto-import config, the `VForm` default, the style utility, the three npm
+packages and the toastify CSS. If anything is missing, **stop and tell the
+developer which pieces are missing** — the project was probably created from stock Materio or an
 older kit. Don't fall back to the stock equivalent (`IconBtn`, `type="number"`,
-`type="date"`, `AppDateTimePicker`) without their go-ahead.
+`type="date"`, `AppDateTimePicker`, `VSnackbar`) without their go-ahead.
 
 Quick check — set `SRC` to the root from Step 0, run from the project root; it
 works for every variant and prints only what's missing:
@@ -112,7 +115,8 @@ grep -qs "apiErrorMessage" "$SRC/utils/api.ts" || echo "missing: apiErrorMessage
 grep -qs "decimals" "$SRC/components/global/form/NumberField.vue" || echo "outdated: NumberField has no decimals/min/max props"
 grep -qs "validateOn: 'blur lazy'" "$SRC/plugins/vuetify/defaults.ts" || echo "missing: VForm validateOn default in $SRC/plugins/vuetify/defaults.ts"
 grep -rqs "bg-info-block" --include='*.scss' --exclude-dir=node_modules --exclude-dir=.nuxt --exclude-dir=.output --exclude-dir=vendor . || echo "missing: .bg-info-block in the project styles"
-for p in cleave-zen @vuepic/vue-datepicker; do grep -q "\"$p\"" package.json || echo "missing package: $p"; done
+grep -rqs "vue3-toastify/dist/index.css" --include='*.ts' --exclude-dir=node_modules --exclude-dir=.nuxt --exclude-dir=.output --exclude-dir=vendor . || echo "missing: vue3-toastify/dist/index.css (nuxt.config.ts css, or main.ts import)"
+for p in cleave-zen @vuepic/vue-datepicker vue3-toastify; do grep -q "\"$p\"" package.json || echo "missing package: $p"; done
 ```
 
 A file that exists somewhere else (e.g. `$api` defined in another util) is not

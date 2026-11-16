@@ -9,6 +9,8 @@
 
 ```vue
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
+
 const isDeleteDialogVisible = ref(false)
 const deleteError = ref('')
 const isDeleting = ref(false)
@@ -19,6 +21,7 @@ const confirmDelete = async () => {
   try {
     await $api(`/admin/items/${item.value.id}`, { method: 'DELETE' })
     isDeleteDialogVisible.value = false
+    toast.success('Item deleted.')
     refresh()
   }
   catch (e) {
@@ -43,7 +46,12 @@ const confirmDelete = async () => {
     :loading="isDeleting"
     @confirm="confirmDelete"
   >
-    <VAlert v-if="deleteError" type="error" variant="tonal" class="mt-4">{{ deleteError }}</VAlert>
+    <VAlert v-if="deleteError" color="error" variant="tonal" closable class="mt-4" @click:close="deleteError = ''">
+      <div class="d-flex align-center gap-x-2">
+        <VIcon icon="ri-error-warning-line" size="20" />
+        <span>{{ deleteError }}</span>
+      </div>
+    </VAlert>
   </ConfirmActionDialog>
 </template>
 ```
@@ -99,7 +107,7 @@ create when the record prop is empty, edit when it's set.
   visibility note above). Reset `fieldErrors` on open.
 - 422 → `:error-messages` per field; other errors → `VAlert` with
   `apiErrorMessage(e)`.
-- On success: `emit('saved', record)`, close. The caller refreshes
+- On success: `toast.success(...)`, `emit('saved', record)`, close. The caller refreshes
   (`refresh()` of `useServerTable` or of the detail `useApi`) — no navigation.
 - Open it from the list's `PageHeader` "Add" button, the row's Edit
   `ActionIconBtn`, and the detail page's Edit button.
@@ -109,6 +117,8 @@ create when the record prop is empty, edit when it's set.
 ```vue
 <!-- components/pages/admin/customers/CustomerDialog.vue (trimmed) -->
 <script setup lang="ts">
+import { toast } from 'vue3-toastify'
+
 interface Props { isDialogVisible: boolean, customer?: Customer | null }
 const props = defineProps<Props>()
 const emit = defineEmits<{
@@ -143,6 +153,7 @@ const onSubmit = async () => {
     const res = props.customer
       ? await $api<{ data: Customer }>(`/admin/customers/${props.customer.id}`, { method: 'PUT', body: form.value })
       : await $api<{ data: Customer }>('/admin/customers', { method: 'POST', body: form.value })
+    toast.success('Customer saved.')
     emit('saved', res.data)
     emit('update:isDialogVisible', false)
   }
@@ -165,7 +176,12 @@ const onSubmit = async () => {
     <VCard :title="props.customer ? 'Edit Customer' : 'Add Customer'">
       <DialogCloseBtn @click="emit('update:isDialogVisible', false)" />
       <VCardText>
-        <VAlert v-if="formError" type="error" variant="tonal" class="mb-4">{{ formError }}</VAlert>
+        <VAlert v-if="formError" color="error" variant="tonal" closable class="mb-4" @click:close="formError = ''">
+          <div class="d-flex align-center gap-x-2">
+            <VIcon icon="ri-error-warning-line" size="20" />
+            <span>{{ formError }}</span>
+          </div>
+        </VAlert>
         <VForm id="customer-dialog-form" ref="refForm" @submit.prevent="onSubmit">
           <VTextField v-model="form.name" label="Name *" maxlength="100" :rules="[requiredValidator]" :error-messages="fieldErrors.name" />
           <!-- other fields: same `:error-messages="fieldErrors.<field>"` and their own `maxlength` -->
@@ -173,7 +189,7 @@ const onSubmit = async () => {
       </VCardText>
       <VCardText class="d-flex justify-end gap-4">
         <VBtn color="secondary" variant="outlined" @click="emit('update:isDialogVisible', false)">Cancel</VBtn>
-        <VBtn type="submit" form="customer-dialog-form" :loading="isSubmitting">{{ props.customer ? 'Save Changes' : 'Add Customer' }}</VBtn>
+        <VBtn type="submit" form="customer-dialog-form" :loading="isSubmitting" :disabled="isSubmitting">{{ props.customer ? 'Save Changes' : 'Add Customer' }}</VBtn>
       </VCardText>
     </VCard>
   </VDialog>

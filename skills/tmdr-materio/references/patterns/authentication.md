@@ -52,7 +52,12 @@ const onSubmit = async () => {
       </VCardText>
 
       <VCardText>
-        <VAlert v-if="formError" type="error" variant="tonal" class="mb-4">{{ formError }}</VAlert>
+        <VAlert v-if="formError" color="error" variant="tonal" closable class="mb-4" @click:close="formError = ''">
+          <div class="d-flex align-center gap-x-2">
+            <VIcon icon="ri-error-warning-line" size="20" />
+            <span>{{ formError }}</span>
+          </div>
+        </VAlert>
         <VForm ref="refForm" autocomplete="off" @submit.prevent="onSubmit">
           <VRow>
             <VCol cols="12">
@@ -75,7 +80,7 @@ const onSubmit = async () => {
                 <RouterLink class="text-primary" :to="{ name: 'forgot-password' }">Forgot Password?</RouterLink>
               </div>
 
-              <VBtn block type="submit" :loading="isSubmitting">Login</VBtn>
+              <VBtn block type="submit" :loading="isSubmitting" :disabled="isSubmitting">Login</VBtn>
             </VCol>
 
             <VCol cols="12" class="text-center text-base">
@@ -131,7 +136,7 @@ const resendCooldown = useSecondsLeft()
 <p class="text-body-2">
   {{ expiry.left.value ? `The code expires in ${mmss(expiry.left.value)}` : 'The code has expired. Request a new one.' }}
 </p>
-<VBtn variant="text" :disabled="resendCooldown.left.value > 0" :loading="isResending" @click="resend">
+<VBtn variant="text" :disabled="resendCooldown.left.value > 0 || isResending" :loading="isResending" @click="resend">
   {{ resendCooldown.left.value ? `Resend in ${mmss(resendCooldown.left.value)}` : 'Resend code' }}
 </VBtn>
 ```

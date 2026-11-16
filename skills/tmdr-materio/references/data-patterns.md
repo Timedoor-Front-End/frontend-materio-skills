@@ -57,8 +57,11 @@ client) and `$api` wraps `$fetch`. Use `useApi` for page-load data and
 `$api` inside handlers; never call `useApi` from a click handler. Read the
 actual `composables/useApi.ts` before relying on its return shape.
 
-**Not shipped in the starter-kit:** a toast/snackbar store, an auth store,
-a router auth guard, a registered CASL `abilitiesPlugin`. Check the repo
+Toasts need no store: call `toast.success()` / `toast.error()` from
+`vue3-toastify` directly (SKILL.md "Notifications").
+
+**Not shipped in the starter-kit:** an auth store, a router auth guard,
+a registered CASL `abilitiesPlugin`. Check the repo
 first — the project may have added them. If a page needs one that doesn't
 exist, flag it as an escalation (see SKILL.md).
 
@@ -97,14 +100,19 @@ Everything else:
   (or `"table"`, `"list-item-two-line"`, matching the shape) in place of the
   content while `isFetching` is true and there's no data yet. **Refetch**: keep
   the content and set `:loading="isFetching"` on its `VCard`.
-- **Load error**: `VAlert type="error"` with `apiErrorMessage(error.value)` and a
-  Retry button (`@click="execute()"`), never a blank card.
+- **Load error**: `VAlert color="error" variant="tonal"` with the icon inline
+  (same markup as the `formError` alert in "Forms and mutations"),
+  `apiErrorMessage(error.value)` and a Retry button (`@click="execute()"`).
+  Not `closable`: closing it would leave a blank card, and never a blank card.
 - **Empty list** that isn't a table (cards grid, timeline, chips): a
   `v-if="!items.length"` block with an icon, one line saying what's missing
   ("No branches yet"), and the page's primary action if it has one. When search
   or filters are active, say so instead ("No branches match your search").
-- **Submit / action buttons**: `:loading` while their request runs (see "Forms
-  and mutations").
+- **Submit / action buttons**: `:loading="x" :disabled="x"` while their request
+  runs (see "Forms and mutations"). `loading` on a Vuetify 3 `VBtn` only shows a
+  spinner: the button still takes clicks and Enter still submits the form, so
+  without `:disabled` the request is sent twice. If the button already has a
+  `:disabled`, combine them: `:disabled="otherCondition || x"`.
 
 ## URLs
 
@@ -121,6 +129,7 @@ Everything else:
 
 ```ts
 import type { FetchError } from 'ofetch' // $api (ofetch / Nuxt $fetch) throws this
+import { toast } from 'vue3-toastify'
 
 const isSubmitting = ref(false)
 const fieldErrors = ref<Record<string, string[]>>({})
@@ -137,6 +146,7 @@ const onSubmit = async () => {
   try {
     await $api('/items', { method: 'POST', body: form.value })
     isDialogVisible.value = false
+    toast.success('Item saved.')
     refresh() // useServerTable's / useApi's refresh; from a dialog component: emit('saved', ...)
   }
   catch (e) {
@@ -155,8 +165,19 @@ const onSubmit = async () => {
 
 ```vue
 <VTextField v-model="form.name" :error-messages="fieldErrors.name" />
-<VAlert v-if="formError" type="error" variant="tonal">{{ formError }}</VAlert>
+<VAlert v-if="formError" color="error" variant="tonal" closable class="mb-4" @click:close="formError = ''">
+  <div class="d-flex align-center gap-x-2">
+    <VIcon icon="ri-error-warning-line" size="20" />
+    <span>{{ formError }}</span>
+  </div>
+</VAlert>
 ```
+
+- Error alerts use `color="error"` with the icon inline, never `type="error"`:
+  Materio renders `type`'s icon inside a solid colored box
+  (`@core/scss/template/libs/vuetify/components/_alert.scss`). Form/action
+  alerts (`formError`, `deleteError`, …) are `closable` and closing clears the
+  message; a load-error alert with Retry is not closable.
 
 - Server-side validation is the source of truth (business rules live
   there). Client rules in `:rules` are only for instant feedback; always
@@ -187,7 +208,7 @@ const onSubmit = async () => {
   `requiredValidator` works; `0,00` counts as filled). For a range use its
   `:min`/`:max` props, not `betweenValidator` — that one would get the formatted text.
 - Clear a field's server error when the user edits it, if the form is long.
-- Put the loading flag on the submit button: `<VBtn :loading="isSubmitting">`.
+- Put the loading flag on the submit button: `<VBtn :loading="isSubmitting" :disabled="isSubmitting">`.
 - Always reset loading in `finally`.
 - Don't show raw response bodies or tokens to the user. Every error message
   shown to the user comes from `apiErrorMessage()`, which turns 5xx and network

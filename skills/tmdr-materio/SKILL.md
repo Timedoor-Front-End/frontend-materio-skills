@@ -302,6 +302,13 @@ props, examples and gotchas live in the file it points to.
   segments with `-`: `pages/customers/index.vue` → `customers`).
   `isNavLinkActive` in `<src>/@layouts/utils.ts` compares names with `===`, so
   `{ name: 'customers' }` type-checks but never highlights the item.
+- **Notifications:** feedback after an action is `toast.success(msg)` (saved,
+  deleted) / `toast.error(msg)` (an API error with no form or dialog open, e.g. a
+  one-click row action) from `vue3-toastify`
+  (`import { toast } from 'vue3-toastify'` — not auto-imported), never `VSnackbar`.
+  Errors of a form or dialog stay inline in its `VAlert`, where the user fixes them.
+  `VSnackbar` stays only for persistent state banners (the offline banner,
+  `checklist.md` S1).
 - **Raw HTML:** `v-html` only for HTML the backend sanitizes (rich-text fields);
   everything else renders with `{{ }}`. → `references/data-patterns.md` →
   "Rendering HTML".

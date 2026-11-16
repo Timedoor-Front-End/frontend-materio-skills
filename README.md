@@ -98,7 +98,7 @@ Before the first page of a session, the skill checks that these pieces exist. It
 | `composables/useServerTable.ts` | State for `VDataTableServer`. Search and filters are debounced 500ms, paging is immediate. |
 | `utils/format.ts` and `utils/api.ts` | `formatRupiah`, `formatDate`, `initials`, `$api`, `apiErrorMessage`. |
 | Auto-import config, `VForm` default, `.bg-info-block` style | `components/global` auto-imported, validation on blur and submit only (`validateOn: 'blur lazy'`). |
-| npm packages | `cleave-zen` and `@vuepic/vue-datepicker` **v14**. |
+| npm packages | `cleave-zen`, `@vuepic/vue-datepicker` **v14** and `vue3-toastify` (its CSS loaded in `main.ts`, or `css` in `nuxt.config.ts`). |
 
 If anything is missing, the skill lists the missing pieces and stops. After a passing check it records `> Starter kit: OK (date)` in `docs/PLAN.md`, so a new session can skip the check.
 
@@ -466,4 +466,5 @@ The **Senior Dev Check** column always stays `Not Checked`. It belongs to the re
 
 | Date | Changes |
 | --- | --- |
+| 2026-11-16 | Notifications use `vue3-toastify` (`toast.success()` / `toast.error()`) after save/delete instead of `VSnackbar` (form and dialog errors stay in their `VAlert`); the starter kit check now requires the `vue3-toastify` package and its CSS. |
 | 2026-10-20 | First version of this documentation, covering stack detection, the starter kit check, planning with `docs/PLAN.md`, frontend and Laravel backend generation, and checklist audit mode. |

@@ -46,7 +46,12 @@ Shape (matches the design reference): optional back button (`ActionIconBtn`,
 ```vue
 <!-- Detail/edit page (nested): render the header once the record has loaded -->
 <template>
-  <VAlert v-if="error" type="error" variant="tonal">Customer not found.</VAlert>
+  <VAlert v-if="error" color="error" variant="tonal">
+    <div class="d-flex align-center gap-x-2">
+      <VIcon icon="ri-error-warning-line" size="20" />
+      <span>Customer not found.</span>
+    </div>
+  </VAlert>
   <template v-else-if="data">
     <PageHeader :title="data.data.name" subtitle="Orders and contact details" />
     <VRow>...</VRow>
@@ -76,7 +81,7 @@ in a field submits too):
   <PageHeader :title="props.title" :subtitle="props.subtitle">
     <template #actions>
       <VBtn color="secondary" variant="outlined" :to="cancelTo">Cancel</VBtn>
-      <VBtn type="submit" form="order-form" :loading="isSubmitting">Save Changes</VBtn>
+      <VBtn type="submit" form="order-form" :loading="isSubmitting" :disabled="isSubmitting">Save Changes</VBtn>
     </template>
   </PageHeader>
 

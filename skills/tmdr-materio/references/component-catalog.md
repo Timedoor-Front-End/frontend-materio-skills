@@ -57,7 +57,7 @@ Required by the conventions; use these instead of the stock equivalents.
 ## `<src>/components/global/dialogs/` (all are `v-model:is-dialog-visible` popups — see `patterns/dialogs.md` for usage shape)
 The starter kit removed Materio's unused demo dialogs (address, role/permission, payment, 2FA, pricing, share, refer, create-app,
 user-info) and the demo `ConfirmDialog`. Don't reference them; write a new dialog per `patterns/dialogs.md` instead.
-- `ConfirmActionDialog.vue` — **starter kit**: confirm before a server action (delete, cancel, deactivate). Props `title`, `message`, `confirm-text`, `cancel-text`, `confirm-color`, `loading`; emits `confirm`; default slot for extra fields or the server's error `VAlert`. The page closes it after the request succeeds.
+- `ConfirmActionDialog.vue` — **starter kit**: confirm before a server action (delete, cancel, deactivate). Props `title`, `message`, `confirm-text`, `cancel-text`, `confirm-color`, `loading` (spinner on the confirm button and disables it, so a second click can't resend the request); emits `confirm`; default slot for extra fields or the server's error `VAlert`. The page closes it after the request succeeds.
 
 ## `<src>/@core/components/`
 - `AppDrawerHeaderSection.vue` — standard header (title + close button) for `VNavigationDrawer` side panels — use this for any custom "Add New X" drawer.
@@ -83,3 +83,4 @@ user-info) and the demo `ConfirmDialog`. Don't reference them; write a new dialo
 
 ## Vuetify primitives (always available, already themed by Materio — see `plugins/vuetify/defaults.ts` for defaults like `VBtn` primary color, `VTextField` outlined/comfortable)
 `VCard`, `VCardText`, `VCardTitle`, `VRow`, `VCol`, `VBtn`, `VTextField`, `VSelect`, `VAutocomplete`, `VCheckbox`, `VRadio`, `VSwitch`, `VChip`, `VAvatar`, `VIcon`, `VDivider`, `VDataTableServer`, `VDataTable`, `VDialog`, `VForm`, `VTooltip`, `VMenu`, `VList`/`VListItem`, `VNavigationDrawer`, `VWindow`/`VWindowItem`, `VTabs`/`VTab`, `VSpacer`. Only reach for raw Vuetify composition (rung 3 of the escalation) after checking layers 1 and 2.
+- Error `VAlert`: `color="error" variant="tonal"` with `<VIcon icon="ri-error-warning-line" size="20" />` inline next to the text in a `d-flex align-center gap-x-2` div, never `type="error"` (Materio puts that icon in a solid colored box). Form/action errors are `closable` with `@click:close` clearing the message; load errors with a Retry button are not closable. Markup: `data-patterns.md` "Forms and mutations".

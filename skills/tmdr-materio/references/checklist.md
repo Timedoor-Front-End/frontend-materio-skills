@@ -42,7 +42,7 @@ Names are verbatim from Notion, so audit rows can be matched back.
 | U5 | Hover effects, transitions, and animations work as intended. | Rule + Manual | Vuetify's built-in states only, no custom transitions |
 | U6 | All modals, dropdowns, and tooltips can be closed properly. | Rule | SKILL.md "Dialogs and menus close" |
 | U7 | A clear "empty state" is shown when there is no data. | Rule | `patterns/tables.md` "Empty state", `data-patterns.md` "Loading and empty states" |
-| U8 | A loading state is always shown when fetching data or submitting a form. | Rule | tables `:loading`, submit `:loading`, `data-patterns.md` "Loading and empty states" |
+| U8 | A loading state is always shown when fetching data or submitting a form. | Rule | tables `:loading`, submit `:loading` — a button in a loading state is also disabled, `data-patterns.md` "Loading and empty states" |
 | U9 | Show a confirmation popup before any destructive action (like deleting data). | Rule | SKILL.md "Destructive actions" (`ConfirmActionDialog`) |
 | U10 | Use type="password" for all password input fields. | Rule | SKILL.md "Password fields" |
 | U11 | Date of birth inputs should default to 10 years ago and start with year selection. | Rule (+ Setup S8) | `<DateTimeField birth-date>` |
