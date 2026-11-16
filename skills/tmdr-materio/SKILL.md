@@ -324,8 +324,9 @@ Checklist rules (`references/checklist.md` maps every checklist item to its rule
   `h2` → `h3` without skipping (`<h2 class="text-h5">`). Never pick a tag for its
   size.
 - **Responsive:** lay out with `VRow`/`VCol`. Every `VCol` has `cols="12"` plus
-  `sm`/`md` widths for wider screens. Button and filter rows use
-  `d-flex flex-wrap gap-4`. No fixed px widths or heights on containers
+  `sm`/`md` widths for wider screens. Button rows use `d-flex flex-wrap gap-4`;
+  search/filter rows use a `VRow` of fixed-width `VCol`s plus a reset button
+  (`references/patterns/tables.md`). No fixed px widths or heights on containers
   (`max-width` on dialogs is fine). Tables scroll inside their card, and the page
   never scrolls sideways. Keep the kit's control sizes: no `size="x-small"` /
   `"small"` on action buttons, since they become too small to tap.

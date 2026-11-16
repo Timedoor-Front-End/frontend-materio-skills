@@ -15,8 +15,11 @@
 import { formatDate } from '@/utils/format'
 import type { Invoice } from '@/utils/domain'
 
-const search = ref('')
+const search = ref<string | null>(null)
 const status = ref<string | null>(null)
+
+const hasFilters = computed(() => !!(search.value || status.value))
+const resetFilters = () => { search.value = null; status.value = null }
 
 const headers = [
   { title: '#', key: 'number' },
@@ -57,9 +60,18 @@ const statusColor = (s: string) => ({ paid: 'success', sent: 'primary', overdue:
     </VRow>
 
     <VCard> <!-- table card: no title, no CardIcon -->
-      <VCardText class="d-flex flex-wrap gap-4">
-        <VTextField v-model="search" placeholder="Search invoice" prepend-inner-icon="ri-search-line" density="compact" clearable />
-        <VSelect v-model="status" placeholder="Status" :items="['draft', 'sent', 'paid', 'overdue']" density="compact" clearable />
+      <VCardText>
+        <VRow>
+          <VCol cols="12" sm="6" md="4">
+            <VTextField v-model="search" placeholder="Search invoice" prepend-inner-icon="ri-search-line" density="compact" clearable />
+          </VCol>
+          <VCol cols="12" sm="3" md="2">
+            <VSelect v-model="status" placeholder="Status" :items="['draft', 'sent', 'paid', 'overdue']" density="compact" clearable />
+          </VCol>
+          <VCol v-if="hasFilters" cols="12" sm="auto">
+            <VBtn variant="text" color="error" prepend-icon="ri-refresh-line" @click="resetFilters">Reset Filter</VBtn>
+          </VCol>
+        </VRow>
       </VCardText>
 
       <VDataTableServer

@@ -10,8 +10,11 @@
 <script setup lang="ts">
 import type { Customer } from '@/utils/domain'
 
-const search = ref('')
-const status = ref('active')
+const search = ref<string | null>(null)
+const status = ref<string | null>(null)
+
+const hasFilters = computed(() => !!(search.value || status.value))
+const resetFilters = () => { search.value = null; status.value = null }
 
 const headers = [
   { title: 'Name', key: 'name' },
@@ -28,9 +31,18 @@ const { page, itemsPerPage, sortBy, items, total, isLoading, refresh } = useServ
 
 <template>
   <VCard>
-    <VCardText class="d-flex flex-wrap gap-4">
-      <VTextField v-model="search" placeholder="Search name" prepend-inner-icon="ri-search-line" density="compact" clearable />
-      <VSelect v-model="status" :items="statusOptions" density="compact" />
+    <VCardText>
+      <VRow>
+        <VCol cols="12" sm="6" md="4">
+          <VTextField v-model="search" placeholder="Search name" prepend-inner-icon="ri-search-line" density="compact" clearable />
+        </VCol>
+        <VCol cols="12" sm="3" md="2">
+          <VSelect v-model="status" placeholder="Status" :items="statusOptions" density="compact" clearable />
+        </VCol>
+        <VCol v-if="hasFilters" cols="12" sm="auto">
+          <VBtn variant="text" color="error" prepend-icon="ri-refresh-line" @click="resetFilters">Reset Filter</VBtn>
+        </VCol>
+      </VRow>
     </VCardText>
 
     <VDataTableServer
@@ -42,7 +54,7 @@ const { page, itemsPerPage, sortBy, items, total, isLoading, refresh } = useServ
       :items-length="total"
       :items-per-page-options="[10, 25, 50, 100]"
       :loading="isLoading"
-      :no-data-text="search || status !== 'active' ? 'No customers match your filters.' : 'No customers yet.'"
+      :no-data-text="hasFilters ? 'No customers match your filters.' : 'No customers yet.'"
       item-value="id"
     >
       <template #item.actions="{ item }">
@@ -69,7 +81,27 @@ const { page, itemsPerPage, sortBy, items, total, isLoading, refresh } = useServ
   People use initials instead (SKILL.md "Avatars").
 - The actions column header is `{ key: 'actions', sortable: false, width: 0 }` (default left alignment, no `align: 'end'`) so the column shrinks to its content, and the buttons sit in `<div class="d-flex flex-nowrap gap-2">` so they always stay on one row.
 - Controls above the table inside the same card get the card's 20px inset, no `VDivider` before the table. The page title and primary action live in `PageHeader`, not here.
-  - Search/filter fields: one `<VCardText class="d-flex flex-wrap gap-4">` row.
+  - Search/filter fields: one `<VCardText><VRow>` row with fixed-width `VCol`s, never a `d-flex` row of stretched fields. The search field gets `cols="12" sm="6" md="4"`, each `VSelect` filter `cols="12" sm="3" md="2"`. Leave the rest of the row empty; do not stretch the fields to fill the card.
+    - Reset button: a last `<VCol v-if="hasFilters" cols="12" sm="auto">` holding a red text button. Clicking it clears every filter at once. It only renders while at least one filter is set, and because its column is `auto` width, showing or hiding it does not move the other fields.
+
+      ```vue
+      <VCol
+        v-if="hasFilters"
+        cols="12"
+        sm="auto"
+      >
+        <VBtn
+          variant="text"
+          color="error"
+          prepend-icon="ri-refresh-line"
+          @click="resetFilters"
+        >
+          Reset Filter
+        </VBtn>
+      </VCol>
+      ```
+
+      `hasFilters` is `computed(() => !!(search.value || status.value /* , …each filter */))`, and `resetFilters` sets every filter ref back to `null`. The button label is in the project's UI language.
   - Status tabs: no padding or margin around `VTabs`. Make the tabs themselves roomier: `<VTabs v-model="tab" height="56">` (a `VTab`'s height comes from `VTabs`) and `class="px-6"` on each `VTab`. The active underline sits directly on the table header.
 - For the pagination footer, prefer the catalog's `TablePagination.vue` component instead of hand-rolling prev/next buttons every time.
 - Use `VDataTable` (drop `Server` suffix, drop `items-length`) when the PRD implies a small, fully-client-side list with no need for server pagination — don't default to server pagination for a 20-row static list.

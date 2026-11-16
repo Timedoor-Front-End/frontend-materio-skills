@@ -18,9 +18,12 @@ a page when it doesn't (password rules, profile sections, uploads).
 import UserDialog from '@/components/pages/admin/users/UserDialog.vue'
 import type { User } from '@/utils/domain'
 
-const search = ref('')
+const search = ref<string | null>(null)
 const role = ref<string | null>(null)
 const status = ref<string | null>(null)
+
+const hasFilters = computed(() => !!(search.value || role.value || status.value))
+const resetFilters = () => { search.value = null; role.value = null; status.value = null }
 
 const headers = [
   { title: 'User', key: 'name' },
@@ -51,10 +54,21 @@ const openUserDialog = (u: User | null) => { editTarget.value = u; isUserDialogV
     </PageHeader>
 
     <VCard> <!-- filters live in the table card: no title, no CardIcon -->
-      <VCardText class="d-flex flex-wrap gap-4">
-        <VTextField v-model="search" placeholder="Search name or email" prepend-inner-icon="ri-search-line" density="compact" clearable />
-        <VSelect v-model="role" placeholder="Role" :items="roleOptions" density="compact" clearable />
-        <VSelect v-model="status" placeholder="Status" :items="['active', 'pending', 'inactive']" density="compact" clearable />
+      <VCardText>
+        <VRow>
+          <VCol cols="12" sm="6" md="4">
+            <VTextField v-model="search" placeholder="Search name or email" prepend-inner-icon="ri-search-line" density="compact" clearable />
+          </VCol>
+          <VCol cols="12" sm="3" md="2">
+            <VSelect v-model="role" placeholder="Role" :items="roleOptions" density="compact" clearable />
+          </VCol>
+          <VCol cols="12" sm="3" md="2">
+            <VSelect v-model="status" placeholder="Status" :items="['active', 'pending', 'inactive']" density="compact" clearable />
+          </VCol>
+          <VCol v-if="hasFilters" cols="12" sm="auto">
+            <VBtn variant="text" color="error" prepend-icon="ri-refresh-line" @click="resetFilters">Reset Filter</VBtn>
+          </VCol>
+        </VRow>
       </VCardText>
 
       <VDataTableServer
